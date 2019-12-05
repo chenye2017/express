@@ -2,9 +2,38 @@ var express = require('express');
 var app = express();
 var {crawlGet} = require('./service/crawl');
 var {handleWxPublic} = require('./service/handleWxpublic')
+var {md5Crypto} = require('./service/common')
+
+app.use(function (req,res, next) {
+    let NODE_ENV = process.env.NODE_ENV
+    if (typeof  NODE_ENV === 'undefined') {
+        throw new Error('please set NODE_ENV')
+    }
+    if (NODE_ENV == 'prod') {
+        let arr = []
+        for (var prop in req.query) {
+            if (prop != 'sign')
+                arr.push(prop)
+        }
+        arr.sort()
+        if (arr.length > 0) {
+            let str = '';
+            arr.forEach((key) => {
+                str += req.query[key] + '.'
+            })
+            let sign = md5Crypto(str + 'shihuoapp')
+            if (req.query.sign !== sign) {
+                throw  new Error('非法请求')
+            }
+        }
+        next()
+    } else if (NODE_ENV == 'dev') {
+        next()
+    }
+})
 
 app.get('/', function (req, res) {
-    res.send('Hello World');
+    res.send('Hello World2');
 })
 
 
