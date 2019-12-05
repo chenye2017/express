@@ -16,12 +16,14 @@ app.use(function (req,res, next) {
                 arr.push(prop)
         }
         arr.sort()
+        //console.log(req.query)
         if (arr.length > 0) {
             let str = '';
             arr.forEach((key) => {
                 str += req.query[key] + '.'
             })
-            let sign = md5Crypto(str + 'shihuoapp')
+            let sign = md5Crypto(str + 'shihuoapp.')
+           // console.log(sign, str, req.query.sign)
             if (req.query.sign !== sign) {
                 throw  new Error('非法请求')
             }
@@ -74,7 +76,6 @@ var server = app.listen(8081, function () {
     var host = server.address().address
     var port = server.address().port
     console.log("应用实例，访问地址为 http://%s:%s", host, port)
-
 })
 
 
